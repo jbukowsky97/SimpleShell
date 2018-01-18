@@ -7,23 +7,31 @@
 
 int main(int argc, char** argv) {
     char instruction[1000];
-    printf("SimpleShell > ");
-    //get input from user and store in instruction
-    fgets(instruction, 1000, stdin);
-    //remove '\n' from passphrase becuase fgets includes '\n'
-    if (strlen(instruction) != 0 && instruction[strlen(instruction) - 1] == '\n') {
-        instruction[strlen(instruction) - 1] = '\0';
-    }
-    pid_t pid;
-    if ((pid = fork()) < 0) {
-        perror("fork failure");
-        exit(1);
-    }
-    else if (pid == 0) {
-        //child
-    }
-    else {
-        //parent
-    }
+    while (1) {
+        printf("SimpleShell > ");
+        //get input from user and store in instruction
+        fgets(instruction, 1000, stdin);
+        //remove '\n' from passphrase becuase fgets includes '\n'
+        if (strlen(instruction) > 0 && instruction[strlen(instruction) - 1] == '\n') {
+            instruction[strlen(instruction) - 1] = '\0';
+        }
+
+        if (strlen(instruction) <= 0) {
+            printf("Invalid command\n");
+        }
+
+        pid_t pid;
+        if ((pid = fork()) < 0) {
+            perror("fork failure");
+            exit(1);
+        }
+        else if (pid == 0) {
+            //child
+            
+        }
+        else {
+            //parent
+        }
+    }   
     return 0;
 }
