@@ -4,11 +4,17 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <string.h>
+#include <sys/time.h>
+#include <sys/resource.h>
 
 int main(int argc, char** argv) {
     char instruction[1000];
+    struct rusage r;
+    long previous_sec = 0;
+    long previous_usec = 0;
+    long previous_switch = 0;
     while (1) {
-        printf("SIMPLESHELL > ");
+        printf("[SimpleShell] > ");
         //get input from user and store in instruction
         fgets(instruction, 1000, stdin);
         //remove '\n' from passphrase becuase fgets includes '\n'
@@ -68,7 +74,17 @@ int main(int argc, char** argv) {
         else {
             //parent
             pid = wait(&status);
+            
+            if (getrusage(RUSAGE_CHILDREN, &r) < 0) {
+                printf("could not get stats on process\n");
+            }else {
+                printf("\nuser cpu time:\t%ld seconds, %ld microseconds\n", r.ru_utime.tv_sec - previous_sec, r.ru_utime.tv_usec - previous_usec);
+                printf("involuntary context switches:\t%ld\n\n", r.ru_nivcsw - previous_switch);
+                previous_sec = r.ru_utime.tv_sec;
+                previous_usec = r.ru_utime.tv_usec;
+                previous_switch = r.ru_nivcsw;
+            }
         }
-    }   
+    }
     return 0;
 }
